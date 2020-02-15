@@ -1,6 +1,6 @@
 //@version=4
-//GrimmLemon version 3.5.4
-study(title="GrimmLemon", shorttitle="GrimmLemon", overlay=true, precision=8)
+//GitLemon
+study(title="GitLemon", shorttitle="GitLemon", overlay=true, precision=8)
 
 
 // INPUTS
