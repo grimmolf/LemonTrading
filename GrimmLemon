@@ -469,6 +469,28 @@ SQON = strict and diff < 0 ? true : not strict and kupper > upper and klower < l
 mid_color = SQON ? color.red : color.green
 //============================================================
 
+// message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
+// alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
+// alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
+alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
+
+//============================================================
+// Alerts for Trade opening
+//============================================================
+
+// message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
+// alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
+// alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
+alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
+
+// alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} - Lemon short entry") // Original Code
+// alertcondition(high > 0, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
+alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market")
+
+
+//============================================================
+//Plots for trade signal
+//============================================================
 
 Shorttradetrigger = if (show and shortCondition and not shortCondition[1] and SQON)
     StopLevel := highest_1 * ((100 + stopLossPercentage) / 100)
@@ -540,16 +562,9 @@ plotshape(show and longCondition[1], title="Lemon long confirmed", style=shape.c
 plotshape(show and shortCondition[1], title="Lemon short confirmed", style=shape.cross, location=location.top, color=color.red, text="alert", transp=100)
 
 
-// alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} - Lemon short entry") // Original Code
-// alertcondition(high > 0, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market")
 if Shorttradeactive == true
     Shorttradetrigger := false
 
-// message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
-// alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
-// alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
 if Longtradeactive == true
     Longtradetrigger := false
 
