@@ -97,7 +97,6 @@ ranger = useTrueRange ? tr : high - low
 rangema = ema(ranger, klength)
 kupper = ma + rangema * kmult
 klower = ma - rangema * kmult
-c = color.blue
 
 bband(length, mult) =>
 	sma(close, length) + mult * stdev(close, length)
