@@ -467,25 +467,28 @@ osc_color = osc[1] < osc[0] ? osc[0] >= 0 ? #00ffff : #cc00cc : osc[0] >= 0 ? #0
 
 SQON = strict and diff < 0 ? true : not strict and kupper > upper and klower < lower ? true : false
 mid_color = SQON ? color.red : color.green
-//============================================================
-
-// message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
-// alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
-// alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
 
 //============================================================
 // Alerts for Trade opening
 //============================================================
+//=======================================================
+// Added by Joshua 2-10-20 for Autoview 
+// plot(entry_buy, title='Entry Buy', transp=100)
+// e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit
 
+// Going to use market orders at first.
+// SYNTAX FOR AUTOVIEW //
+// b=long e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Long
+// b=short e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Short 
+// c=position e=bitmex-testnet t=market ro=1 // Closes all open positions at market w/ reduce only flag - Closing Signals Alert // Tested Successfully
 // message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
-// alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
 // alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
+alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
+// alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
 
-// alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} - Lemon short entry") // Original Code
 // alertcondition(high > 0, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market")
+alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} - Lemon short entry") // Original Code
+// alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market")
 
 
 //============================================================
@@ -518,20 +521,6 @@ Longtradetrigger = if (show and longCondition and not longCondition[1] and SQON)
     tradeactive := true
     Longtradeactive := true
 
-
-//=======================================================
-// Added by Joshua 2-10-20 for Autoview 
-// plot(entry_buy, title='Entry Buy', transp=100)
-// e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit
-
-// Going to use market orders at first.
-// SYNTAX FOR AUTOVIEW //
-
-// b=long e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Long
-
-// b=short e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Short 
-
-// c=position e=bitmex-testnet t=market ro=1 // Closes all open positions at market w/ reduce only flag - Closing Signals Alert // Tested Successfully
 
 // Plot 0
 plot(TradeSizeInUSD, title="TradeSizeInUSD", transp=100) // This will be the q=
@@ -607,62 +596,6 @@ Bartype3_a_short = high > EntryLevel and high  < StopLevel and low < BELevel and
 
 Bartype4_a_long = high > TPLevel and low < EntryLevel and low > StopLevel and close > BELevel and Longtradeactive
 Bartype4_a_short = high > EntryLevel and high < StopLevel and low < TPLevel and close < BELevel and Shorttradeactive
-//barcolor(Bartype4_a_long or Bartype4_a_short? color.purple : na)
-
-//Bartype4_a_Counter = 0    
-//Bartype4_a_Counter := nz(Bartype4_a_Counter[1])
-//if Bartype4_a_long or Bartype4_a_short
-//    Bartype4_a_Counter := Bartype4_a_Counter + 1
-    
-// Definition of Maintypes of conflicting bars:  ONLY USED FOR CODE OPTIMISATION AND STATS OF UNCERTAINTY
-//-------------------------------------------------------------------------------------------------------
-
-//Bartype 3:  Candle range crosses both BELevel and EntryLevel
-//-------------------------------------------------------------------------------------------------------
-// = high > BELevel and high < TPLevel and low < EntryLevel and low > StopLevel and Longtradeactive and not Bartype3_a_long
-//Bartype3_short = high > EntryLevel and high  < StopLevel and low < BELevel and low > TPLevel and Shorttradeactive and not Bartype3_a_short
-//barcolor(Bartype3_long or Bartype3_short? color.yellow : na)
-
-
-//Bartype 4:  Candle range crosses EntryLevel, BELevel and TPLevel
-//-------------------------------------------------------------------------------------------------------
-//Bartype4_long = high > TPLevel and low < EntryLevel and low > StopLevel and Longtradeactive and not Bartype4_a_long
-//Bartype4_short = high > EntryLevel and high < StopLevel and low < TPLevel and Shorttradeactive and not Bartype4_a_short
-//barcolor(Bartype4_long or Bartype4_short? color.orange : na)
-
-//Bartype 5:  Candle range crosses StopLevel, EntryLevel and BELevel
-//-------------------------------------------------------------------------------------------------------
-//Bartype5_long = high > BELevel and high < TPLevel and low < StopLevel and Longtradeactive
-//Bartype5_short = high > StopLevel and low < BELevel and low > TPLevel and Shorttradeactive
-//barcolor(Bartype5_long or Bartype5_short? color.white : na)
-
-//Bartype 6:  Candle range crosses StopLevel, EntryLevel, BELevel and TPLevel
-//-------------------------------------------------------------------------------------------------------
-//Bartype6_long = high > TPLevel and low < StopLevel and Longtradeactive
-//Bartype6_short = high > StopLevel and low < TPLevel and Shorttradeactive
-//barcolor(Bartype6_long or Bartype6_short? color.blue : na)
-
-//Bartype counters
-//-------------------------------------------------------------------------------------------------------
-//Bartype3Counter = 0
-//Bartype3Counter := nz(Bartype3Counter[1])
-//if Bartype3_long or Bartype3_short
-//    Bartype3Counter := Bartype3Counter + 1
-
-//Bartype4Counter = 0
-//Bartype4Counter := nz(Bartype4Counter[1])
-//if Bartype4_long or Bartype4_short
-//    Bartype4Counter := Bartype4Counter + 1
-
-//Bartype5Counter = 0
-//Bartype5Counter := nz(Bartype5Counter[1])
-//if Bartype5_long or Bartype5_short
-//    Bartype5Counter := Bartype5Counter + 1
-
-//Bartype6Counter = 0    
-//Bartype6Counter := nz(Bartype6Counter[1])
-//if Bartype6_long or Bartype6_short
-//    Bartype6Counter := Bartype6Counter + 1
 
 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
