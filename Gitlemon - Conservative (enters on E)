@@ -91,9 +91,8 @@ ksrc = input(close, title="Keltner Source")
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // NON-INPUT VARIABLES
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- 
-Min_Trade_Risk = atr(14)
-Max_Trade_Risk = 2*atr(14)
+Min_Trade_Risk = 2*atr(14)
+Max_Trade_Risk = 4*atr(14)
 StatisticsVerticalOffset = 3*atr(14)
  
 low_m1 = security(syminfo.tickerid, "1", low)
@@ -216,8 +215,8 @@ withinPeriod = not limitPeriod or timenow - time < hours_in_milliseconds * lengt
 // quickLook = input(defval = true, title = "Quick Look") // ignores historic data and will plot a signal on the chart
 // show_order_details = input(defval = true, title = "Show entry / stoploss / target") // show entry, stoploss and target (toggling this doesn't work)
 show_order_details = true
-entrySource = input(title="Source for stoploss", type=input.source, defval=open)
-stopLossSource = input(title="Source for entry", type=input.source, defval=close)
+entrySource = input(title="Entry Source", type=input.source, defval=close)
+stopLossSource = input(title="Stop Source", type=input.source, defval=open)
 stopLossPercentage = input(defval=0.033, minval=0, maxval=100, step=0.01, title="Stop loss %")
 riskRewardRatio = input(defval=3.0, minval=0.0, title="Risk to Reward 1-to-")
  
@@ -513,7 +512,7 @@ alertcondition(show and shortCondition and not shortCondition[1] and SQON, title
 Shorttradetrigger = if (show and shortCondition and not shortCondition[1] and SQON)
     StopLevel := highest_1 * ((100 + stopLossPercentage) / 100)
     EntryLevel := entrySourceShort[M_pointE]
-    TPLevel := short_entry - (short_stoploss - short_entry) * riskRewardRatio
+    TPLevel := EntryLevel - (StopLevel - EntryLevel) * riskRewardRatio
     BELevel := EntryLevel - (StopLevel - EntryLevel)
     stopdistance := StopLevel - EntryLevel
     TradeSizeInXBT := USDRiskPerTrade / stopdistance
@@ -526,7 +525,7 @@ Shorttradetrigger = if (show and shortCondition and not shortCondition[1] and SQ
 Longtradetrigger = if (show and longCondition and not longCondition[1] and SQON)
     StopLevel := lowest_1 * ((100 - stopLossPercentage) / 100)
     EntryLevel := entrySourceLong[W_pointE]
-    TPLevel := long_entry + (long_entry - long_stoploss) * riskRewardRatio
+    TPLevel := EntryLevel + (EntryLevel - StopLevel) * riskRewardRatio
     BELevel := (EntryLevel - StopLevel) + EntryLevel
     stopdistance := EntryLevel - StopLevel
     TradeSizeInXBT := USDRiskPerTrade / stopdistance
@@ -574,10 +573,10 @@ if Longtradeactive == true
  
  
 // Plot Levels:
-pl1 = plot (StopLevel, title = "stoplevel", color=color.red)
-pl2 = plot (EntryLevel, title = "entrylevel", color=color.white)
-pl3 = plot (BELevel, title = "breakevenlevel", color=color.blue)
-pl4 = plot (TPLevel, title = "TPlevel", color=color.green)
+pl1 = plot (StopLevel, title = "Stop", color=color.red)
+pl2 = plot (EntryLevel, title = "Entry", color=color.white)
+pl3 = plot (BELevel, title = "BE", color=color.blue)
+pl4 = plot (TPLevel, title = "TP", color=color.green)
  
 fill(pl1, pl2, color=color.red, transp=65)
 fill(pl2, pl3, color=color.blue, transp=65)
