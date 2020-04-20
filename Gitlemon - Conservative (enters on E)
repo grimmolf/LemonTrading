@@ -1,46 +1,61 @@
 //@version=4
 //GitLemon
-study(title="GitLemon-cons", shorttitle="GitLemon-cons", overlay=true, precision=8)
-
-
+study(title="GitLemon Modified", shorttitle="GitLemon Modified", overlay=true, precision=8)
+ 
+ 
 // INPUTS
 src = input(title="Source", type=input.source, defval=close)
 
+globalwidth = input(9, minval=5, title="Global Max Width of W/M")
+globaloffset = input(0, minval=0, title="Global Offset of W/M")
+
 includePrice = input(defval=true, title="Use price")
 strictPrice = input(defval=false, title="Strict")
-rangePrice = input(9, minval=5, title="Max. width of price W/M")  // e.g. allow an price W/M to form over 7 bars. 
-offsetPrice = input(0, minval=0, title="Max. offset of price W/M")  // e.g. allow an price W/M to form 1 bar in history. Keep this number low. The goal is to synch the market structure over multiple indicators.
+//rangePrice = input(9, minval=5, title="Max. width of price W/M")  // e.g. allow an price W/M to form over 7 bars. 
+//offsetPrice = input(0, minval=0, title="Max. offset of price W/M")  // e.g. allow an price W/M to form 1 bar in history. Keep this number low. The goal is to synch the market structure over multiple indicators.
+rangePrice = globalwidth
+offsetPrice = globaloffset
 
 includeOBV = input(defval=true, title="Use OBV")
 strictOBV = input(defval=false, title="Strict")
-rangeOBV = input(9, minval=5, title="Max. width of OBV W/M")
-offsetOBV = input(0, minval=0, title="Max. offset of OBV W/M")
+//rangeOBV = input(9, minval=5, title="Max. width of OBV W/M")
+//offsetOBV = input(0, minval=0, title="Max. offset of OBV W/M")
+rangeOBV = globalwidth
+offsetOBV = globaloffset
 
 includeWly = input(defval=true, title="Use Willy")
 includeWillyStupid = input(defval=false, title="Use Willy stupid")
 strictWly = input(defval=false, title="Strict")
-rangeWly = input(9, minval=5, title="Max. width of Willy W/M")
-offsetWly = input(0, minval=0, title="Max. offset of Willy W/M")
+//rangeWly = input(9, minval=5, title="Max. width of Willy W/M")
+//offsetWly = input(0, minval=0, title="Max. offset of Willy W/M")
+rangeWly = globalwidth
+offsetWly = globaloffset
 lengthWly = input(21, minval=1, title="Willy length")
 lengthWlyEma = input(13, minval=1, title="Willy length ema")
 
 
 includeMFI = input(defval=false, title="Use MFI")
 strictMFI = input(defval=true, title="Strict")
-rangeMFI = input(9, minval=5, title="Max. width of MFI W/M")
-offsetMFI = input(0, minval=0, title="Max. offset of MFI W/M")
+//rangeMFI = input(9, minval=5, title="Max. width of MFI W/M")
+//offsetMFI = input(0, minval=0, title="Max. offset of MFI W/M")
+rangeMFI = globalwidth
+offsetMFI = globaloffset
 lengthMFI = input(14, minval=1, title="MFI length")
 
 includeRSI = input(defval=false, title="Use RSI")
 strictRSI = input(defval=true, title="Strict")
-rangeRSI = input(9, minval=5, title="Max. width of RSI W/M")
-offsetRSI = input(0, minval=0, title="Max. offset of RSI W/M")
+//rangeRSI = input(9, minval=5, title="Max. width of RSI W/M")
+//offsetRSI = input(0, minval=0, title="Max. offset of RSI W/M")
+rangeRSI = globalwidth
+offsetRSI = globaloffset
 lengthRSI = input(14, minval=1, title="RSI length")
 
 includeDMI = input(defval=false, title="Use DMI (DI+ & DI-)")
 strictDMI = input(defval=true, title="Strict")
-rangeDMI = input(9, minval=5, title="Max. width of DMI W/M")
-offsetDMI = input(0, minval=0, title="Max. offset of DMI W/M")
+//rangeDMI = input(9, minval=5, title="Max. width of DMI W/M")
+//offsetDMI = input(0, minval=0, title="Max. offset of DMI W/M")
+rangeDMI = globalwidth
+offsetDMI = globaloffset
 lengthDMI = input(14, minval=1, title="DMI length")
 
 includeWithinRLZ = input(defval=false, title="Price within RLZ")
@@ -70,114 +85,114 @@ mult = input(2.0, minval=0.001, maxval=50, title="StDev")
 
 useTrueRange = input(true)
 klength = input(20, minval=1, title="Keltner Length")
-kmult = input(2, title="Multiplier")
+kmult = input(2.0, title="Multiplier")
 ksrc = input(close, title="Keltner Source")
-
+ 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // NON-INPUT VARIABLES
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+ 
 Min_Trade_Risk = atr(14)
 Max_Trade_Risk = 2*atr(14)
 StatisticsVerticalOffset = 3*atr(14)
-
+ 
 low_m1 = security(syminfo.tickerid, "1", low)
 high_m1 = security(syminfo.tickerid, "1", high)
-
+ 
 range = ATH - ATL
-
+ 
 // FOR SQUEEZE MODULE
 basis = sma(src, length)
 dev = mult * stdev(src, length)
 upper = basis + dev
 lower = basis - dev
-
+ 
 ma = ema(src, klength)
 ranger = useTrueRange ? tr : high - low
 rangema = ema(ranger, klength)
 kupper = ma + rangema * kmult
 klower = ma - rangema * kmult
 //c = color.blue
-
+ 
 bband(length, mult) =>
-	sma(close, length) + mult * stdev(close, length)
+    sma(close, length) + mult * stdev(close, length)
 keltner(length, mult) =>
-	ema(close, length) + mult * ema(tr, length)
-	
+    ema(close, length) + mult * ema(tr, length)
+   
 diff = bband(length, 2) - keltner(length, 1)
-
-
+ 
+ 
 ///XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /// Level definitions:
 ///XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+ 
 tradeactive = false
 tradeactive := nz(tradeactive[1])
-
-
+ 
+ 
     // STOP Level:
 StopLevel = 0.00000
 StopLevel := nz(StopLevel[1])
-
+ 
     // Entry Level:
 EntryLevel = 0.00000
 EntryLevel := nz(EntryLevel[1])
-
+ 
     // TP Level:
 TPLevel = 0.00000
 TPLevel := nz(TPLevel[1])
-
+ 
     // Breakeven Level:
 BELevel = 0.00000
 BELevel := nz(BELevel[1])
-
+ 
     // stopdistance
 stopdistance = 0.00000
 stopdistance := nz(stopdistance[1])
-
+ 
     // TradeSizeInXBT
 TradeSizeInXBT = 0.00000
 TradeSizeInXBT := nz(TradeSizeInXBT[1])
-
+ 
     // TradeSizeInUSD
 TradeSizeInUSD = 0
 TradeSizeInUSD := nz(TradeSizeInUSD[1])
-
+ 
     //PositionMarginXBT
 PositionMarginXBT = 0.00000
 PositionMarginXBT := nz(PositionMarginXBT[1])
-
+ 
     //MaxPosMarginXBT
 MaxPosMarginXBT = 0.00000
 MaxPosMarginXBT := nz(MaxPosMarginXBT[1])
-
+ 
 // Long and Short trade definitions:
 //=============================================================
 Longtradeactive = false
 Longtradeactive := Longtradeactive[1]
-
+ 
 Shorttradeactive = false
 Shorttradeactive := Shorttradeactive[1]
-
+ 
 //CALCULATIONS
-
-
-is_rlz_long = barssince(highest(high, lengthPeriodRLZ)) >= 
+ 
+ 
+is_rlz_long = barssince(highest(high, lengthPeriodRLZ)) >=
    barssince(lowest(low, lengthPeriodRLZ))
-is_rlz_short = barssince(highest(high, lengthPeriodRLZ)) < 
+is_rlz_short = barssince(highest(high, lengthPeriodRLZ)) <
    barssince(lowest(low, lengthPeriodRLZ))
-
+ 
 longUpperRLZ = showRLZLong ? (1 - upperBoundRLZ / 100) * range + ATL : na
 longLowerRLZ = showRLZLong ? (1 - lowerBoundRLZ / 100) * range + ATL : na
 longWithinRLZ = longUpperRLZ >= src and src >= longLowerRLZ
 longBelowRLZ = longLowerRLZ > src
 // Moved below Plot for Trade Size for Autoview Testing
-// // Plot 0 
+// // Plot 0
 // p1 = plot(longUpperRLZ, color=color.green, title="61.8 (long)")
 // // Plot 1
 // p2 = plot(longLowerRLZ, color=color.green, title="78.6 (long)")
 // fill(p1, p2, color=#7DCEA0, transp=90, title="RLZ long")
-
+ 
 shortUpperRLZ = showRLZShort ? ATH - (1 - upperBoundRLZ / 100) * range : na
 shortLowerRLZ = showRLZShort ? ATH - (1 - lowerBoundRLZ / 100) * range : na
 shortWithinRLZ = shortUpperRLZ <= src and src <= shortLowerRLZ
@@ -187,29 +202,30 @@ shortAboveRLZ = shortLowerRLZ < src
 // // Plot 3
 // p4 = plot(shortLowerRLZ, color=color.red, title="61.8 (short)")
 // fill(p3, p4, color=#cd6155, transp=90, title="RLZ short")
-
+ 
 includeSMA = input(defval=false, title="Price above/below SMA")
 lengthSMA = input(20, minval=1, title="SMA length")
-
+ 
 // limit by period option
 limitPeriod = input(defval=false, title="Limit period (increases perfomance)")
-lengthPeriod = input(240, minval=1, title="Length of period (hours)")
-
+lengthPeriod = input(245, minval=1, title="Length of period (hours)")
+ 
 hours_in_milliseconds = 1000 * 60 * 60
 withinPeriod = not limitPeriod or timenow - time < hours_in_milliseconds * lengthPeriod
-
+ 
 // quickLook = input(defval = true, title = "Quick Look") // ignores historic data and will plot a signal on the chart
 // show_order_details = input(defval = true, title = "Show entry / stoploss / target") // show entry, stoploss and target (toggling this doesn't work)
 show_order_details = true
-entrySource = input(title="Source for entry", type=input.source, defval=close)
-stopLossSource = input(title="Source for stoploss", type=input.source, defval=close)
-stopLossPercentage = input(defval=0.01, minval=0, maxval=100, step=0.01, title="Stop loss %")
-riskRewardRatio = input(defval=5.0, minval=0.0, title="Risk to Reward 1-to-")
-
+entrySource = input(title="Source for stoploss", type=input.source, defval=open)
+stopLossSource = input(title="Source for entry", type=input.source, defval=close)
+stopLossPercentage = input(defval=0.033, minval=0, maxval=100, step=0.01, title="Stop loss %")
+riskRewardRatio = input(defval=3.0, minval=0.0, title="Risk to Reward 1-to-")
+ 
+// removed the barstate.isreadltime as it seems to be causing a race condition preventing alerts from firing
 //show = not barstate.isrealtime and (includePrice or includeOBV or includeRSI or includeWly or includeMFI or includeDMI)
 show = includePrice or includeOBV or includeRSI or includeWly or includeMFI or includeDMI
 //showPotential = barstate.isrealtime and (includePrice or includeOBV or includeRSI or includeWly or includeMFI or includeDMI) and option_potential
-
+ 
 // create a series of obv, mfi, rsi, sma and willy values
 change_1 = change(src)
 OBVs = cum(change(src) > 0 ? volume : change_1 < 0 ? -volume : 0 * volume)
@@ -224,7 +240,7 @@ upperWly = highest(lengthWly)
 lowerWly = lowest(lengthWly)
 WLYs = 100 * (src - upperWly) / (upperWly - lowerWly)
 emaWly = ema(WLYs, lengthWlyEma)
-
+ 
 series_a_above_series_b(seriesA, seriesB, aRange) =>
     result = true
     for i = 0 to aRange - 1 by 1
@@ -233,7 +249,7 @@ series_a_above_series_b(seriesA, seriesB, aRange) =>
             break
     result := result
     result
-
+ 
 series_a_below_series_b(seriesA, seriesB, aRange) =>
     result = true
     for i = 0 to aRange - 1 by 1
@@ -242,7 +258,7 @@ series_a_below_series_b(seriesA, seriesB, aRange) =>
             break
     result := result
     result
-
+ 
 dirmov(len) =>
     up = change(high)
     down = -change(low)
@@ -250,7 +266,7 @@ dirmov(len) =>
     plus = fixnan(100 * rma(up > down and up > 0 ? up : 0, len) / truerange)
     minus = fixnan(100 * rma(down > up and down > 0 ? down : 0, len) / truerange)
     [plus, minus]
-
+ 
 data_W(aSeries, aRange, anOffset, strict) =>
     e = 0
     d = 0
@@ -263,7 +279,7 @@ data_W(aSeries, aRange, anOffset, strict) =>
     valueB = aSeries[0]
     valueA = aSeries[0]
     found = false
-
+ 
     for offset = 0 to anOffset by 1
         if found
             break
@@ -277,7 +293,7 @@ data_W(aSeries, aRange, anOffset, strict) =>
         valueD := aSeries[0]
         valueB := aSeries[0]
         valueA := aSeries[0]
-
+ 
         for i = 1 to aRange - 1 by 1
             // find d
             if aSeries[i + offset] < aSeries[i + offset - 1] and valueC == aSeries[0]
@@ -306,15 +322,15 @@ data_W(aSeries, aRange, anOffset, strict) =>
             if a == 0
                 break
         // W found if we have found point A, and point B has a lower value than point D                
-        found := a > 0 and a != b and c != 0 and d != 0 and aSeries[e] > aSeries[c] and 
-           aSeries[d] < aSeries[e] and aSeries[d] < aSeries[c] and 
+        found := a > 0 and a != b and c != 0 and d != 0 and aSeries[e] > aSeries[c] and
+           aSeries[d] < aSeries[e] and aSeries[d] < aSeries[c] and
            (aSeries[b] <= aSeries[d] or not strict) and aSeries[b] < aSeries[a]
         found
     entry = found ? aSeries[e] : na
     stopLoss = found ? aSeries[b] * ((100 - stopLossPercentage) / 100) : na
     target = found ? entry + (entry - stopLoss) * riskRewardRatio : na
     [found, entry, stopLoss, target, a, b, c, d, e]
-
+ 
 data_M(aSeries, aRange, anOffset, strict) =>
     e = 0
     d = 0
@@ -327,7 +343,7 @@ data_M(aSeries, aRange, anOffset, strict) =>
     valueB = aSeries[0]
     valueA = aSeries[0]
     found = false
-
+ 
     for offset = 0 to anOffset by 1
         if found
             break
@@ -341,7 +357,7 @@ data_M(aSeries, aRange, anOffset, strict) =>
         valueD := aSeries[0]
         valueB := aSeries[0]
         valueA := aSeries[0]
-
+ 
         for i = 1 to aRange - 1 by 1
             // find d
             if aSeries[i + offset] > aSeries[i + offset - 1] and valueC == aSeries[0]
@@ -370,40 +386,40 @@ data_M(aSeries, aRange, anOffset, strict) =>
             if a == 0
                 break
         // M found if we have found point A, and point B has a greater value than point D                
-        found := a > 0 and a != b and c != 0 and d != 0 and aSeries[e] < aSeries[c] and 
-           aSeries[d] > aSeries[e] and aSeries[d] > aSeries[c] and 
+        found := a > 0 and a != b and c != 0 and d != 0 and aSeries[e] < aSeries[c] and
+           aSeries[d] > aSeries[e] and aSeries[d] > aSeries[c] and
            (aSeries[b] >= aSeries[d] or not strict) and aSeries[b] > aSeries[a]
         found
     entry = found ? aSeries[e] : na
     stopLoss = found ? aSeries[b] * ((100 + stopLossPercentage) / 100) : na
     target = found ? entry - (stopLoss - entry) * riskRewardRatio : na
     [found, entry, stopLoss, target, a, b, c, d, e]
-
-
+ 
+ 
 find_W(aSeries, aRange, anOffset, strict) =>
     [found, entry, stopLoss, target, a, b, c, d, e] = data_W(aSeries, aRange, anOffset, strict)
     found
-
+ 
 find_M(aSeries, aRange, anOffset, strict) =>
     [found, entry, stopLoss, target, a, b, c, d, e] = data_M(aSeries, aRange, anOffset, strict)
     found
-
+ 
 // Direction Movement Index
 [DIplus, DIminus] = dirmov(lengthDMI)
-
+ 
 // calculate if price is below/above SMA
 HighAboveSMA = includeSMA == false or series_a_above_series_b(high, SMAs, rangePrice)
 LowBelowSMA = includeSMA == false or series_a_below_series_b(low, SMAs, rangePrice)
-
+ 
 label_1 = 'davo'
 label_entry = 'entry'
-
+ 
 // PLOT DAV-O
 [W_found, W_entry, W_stopLoss, W_target, W_pointA, W_pointB, W_pointC, W_pointD, W_pointE] = data_W(src, rangePrice, offsetPrice, strictPrice)
 [M_found, M_entry, M_stopLoss, M_target, M_pointA, M_pointB, M_pointC, M_pointD, M_pointE] = data_M(src, rangePrice, offsetPrice, strictPrice)
 priceW = includePrice == false or W_found
 priceM = includePrice == false or M_found
-
+ 
 OBVw = includeOBV == false or find_W(OBVs, rangeOBV, offsetOBV, strictOBV)
 OBVm = includeOBV == false or find_M(OBVs, rangeOBV, offsetOBV, strictOBV)
 MFIw = includeMFI == false or find_W(MFIs, rangeMFI, offsetMFI, strictMFI)
@@ -412,88 +428,88 @@ RSIw = includeRSI == false or find_M(RSIs, rangeRSI, offsetRSI, strictRSI)  // w
 RSIm = includeRSI == false or find_W(RSIs, rangeRSI, offsetRSI, strictRSI)  // we are searching for W's here to be a bear
 Wlyw = includeWly == false or find_W(WLYs, rangeWly, offsetWly, strictWly)
 Wlym = includeWly == false or find_M(WLYs, rangeWly, offsetWly, strictWly)
-DMIw = includeDMI == false or find_W(DIplus, rangeDMI, offsetDMI, strictDMI) and 
+DMIw = includeDMI == false or find_W(DIplus, rangeDMI, offsetDMI, strictDMI) and
    find_M(DIminus, rangeDMI, offsetDMI, strictDMI)
-DMIm = includeDMI == false or find_M(DIplus, rangeDMI, offsetDMI, strictDMI) and 
+DMIm = includeDMI == false or find_M(DIplus, rangeDMI, offsetDMI, strictDMI) and
    find_W(DIminus, rangeDMI, offsetDMI, strictDMI)
-RLZw = includeWithinRLZ == false and includeBelowRLZ == false or 
-   includeWithinRLZ == true and longWithinRLZ or 
+RLZw = includeWithinRLZ == false and includeBelowRLZ == false or
+   includeWithinRLZ == true and longWithinRLZ or
    includeBelowRLZ == true and longBelowRLZ
-RLZm = includeWithinRLZ == false and includeBelowRLZ == false or 
-   includeWithinRLZ == true and shortWithinRLZ or 
+RLZm = includeWithinRLZ == false and includeBelowRLZ == false or
+   includeWithinRLZ == true and shortWithinRLZ or
    includeBelowRLZ == true and shortAboveRLZ
-
-longCondition = LowBelowSMA and priceW and OBVw and MFIw and RSIw and Wlyw and DMIw and 
+ 
+longCondition = LowBelowSMA and priceW and OBVw and MFIw and RSIw and Wlyw and DMIw and
    withinPeriod and (includeWillyStupid == false or emaWly < -80) and RLZw
-shortCondition = HighAboveSMA and priceM and OBVm and MFIm and RSIm and Wlym and DMIm and 
+shortCondition = HighAboveSMA and priceM and OBVm and MFIm and RSIm and Wlym and DMIm and
    withinPeriod and (includeWillyStupid == false or emaWly > -20) and RLZm
-
+ 
 // calculate entry, stoploss and target
 entrySourceLong = entrySource == low ? high : entrySource
 entrySourceShort = entrySource == high ? low : entrySource
 stopSourceLong = stopLossSource == high ? low : stopLossSource
 stopSourceShort = stopLossSource == low ? high : stopLossSource
-
+ 
 long_entry = show and longCondition and not longCondition[1] ? entrySourceLong[W_pointE] : na
 lowest_1 = lowest(stopSourceLong, rangePrice)
-long_stoploss = show and longCondition and not longCondition[1] ? 
+long_stoploss = show and longCondition and not longCondition[1] ?
    lowest_1 * ((100 - stopLossPercentage) / 100) : na
-long_target = show and longCondition and not longCondition[1] ? 
+long_target = show and longCondition and not longCondition[1] ?
    long_entry + (long_entry - long_stoploss) * riskRewardRatio : na
-short_entry = show and shortCondition and not shortCondition[1] ? entrySourceShort[M_pointE] : 
+short_entry = show and shortCondition and not shortCondition[1] ? entrySourceShort[M_pointE] :
    na
 highest_1 = highest(stopSourceShort, rangePrice)
-short_stoploss = show and shortCondition and not shortCondition[1] ? 
+short_stoploss = show and shortCondition and not shortCondition[1] ?
    highest_1 * ((100 + stopLossPercentage) / 100) : na
-short_target = show and shortCondition and not shortCondition[1] ? 
+short_target = show and shortCondition and not shortCondition[1] ?
    short_entry - (short_stoploss - short_entry) * riskRewardRatio : na
-
+ 
 entry = long_entry ? long_entry : short_entry ? short_entry : na
 stoploss = long_stoploss ? long_stoploss : short_stoploss ? short_stoploss : na
 target = long_target ? long_target : short_target ? short_target : na
-
+ 
 // define plot settings for entry, stoploss and target
 transparency = show_order_details ? 0 : 100
 clr_entry = show and (longCondition or shortCondition) ? color.white : na
 clr_stoploss = show and (longCondition or shortCondition) ? color.red : na
 clr_target = show and (longCondition or shortCondition) ? color.lime : na
-
+ 
 //FOR SQUEEZE MODULE
 //============================================================
 e1 = (highest(high, length) + lowest(low, length)) / 2 + sma(close, length)
 osc = linreg(close - e1 / 2, length, 0)
 osc_color = osc[1] < osc[0] ? osc[0] >= 0 ? #00ffff : #cc00cc : osc[0] >= 0 ? #009b9b : #ff9bff
-
+ 
 SQON = strict and diff < 0 ? true : not strict and kupper > upper and klower < lower ? true : false
 mid_color = SQON ? color.red : color.green
-
+ 
 //============================================================
 // Alerts for Trade opening
 //============================================================
 //=======================================================
-// Added by Joshua 2-10-20 for Autoview 
+// Added by Joshua 2-10-20 for Autoview
 // plot(entry_buy, title='Entry Buy', transp=100)
 // e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit
-
+ 
 // Going to use market orders at first.
 // SYNTAX FOR AUTOVIEW //
 // b=long e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Long
-// b=short e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Short 
+// b=short e=bitmex-testnet l={{plot("Leverage")}} q={{plot("TradeSizeInUSD")}} t=market // From Peter - Go Short
 // c=position e=bitmex-testnet t=market ro=1 // Closes all open positions at market w/ reduce only flag - Closing Signals Alert // Tested Successfully
 // message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
 // alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
+alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} LONG') // Original Code
 // alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
-
+ 
 // alertcondition(high > 0, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} - Lemon short entry") // Original Code
+alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} SHORT") // Original Code
 // alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market")
-
-
+ 
+ 
 //============================================================
 //Plots for trade signal
 //============================================================
-
+ 
 Shorttradetrigger = if (show and shortCondition and not shortCondition[1] and SQON)
     StopLevel := highest_1 * ((100 + stopLossPercentage) / 100)
     EntryLevel := entrySourceShort[M_pointE]
@@ -506,7 +522,7 @@ Shorttradetrigger = if (show and shortCondition and not shortCondition[1] and SQ
     MaxPosMarginXBT := (round(100000 * USDRiskPerTrade / Min_Trade_Risk / Leverage)) / 100000
     tradeactive := true
     Shorttradeactive := true
-
+ 
 Longtradetrigger = if (show and longCondition and not longCondition[1] and SQON)
     StopLevel := lowest_1 * ((100 - stopLossPercentage) / 100)
     EntryLevel := entrySourceLong[W_pointE]
@@ -519,8 +535,8 @@ Longtradetrigger = if (show and longCondition and not longCondition[1] and SQON)
     MaxPosMarginXBT := (round(100000 * USDRiskPerTrade / Min_Trade_Risk / Leverage)) / 100000
     tradeactive := true
     Longtradeactive := true
-
-
+ 
+ 
 // Plot 0
 plot(TradeSizeInUSD, title="TradeSizeInUSD", transp=100) // This will be the q=
 // Plot 1
@@ -529,11 +545,11 @@ plot(EntryLevel, title="EntryLevel", transp=100) // This will be the fp= after t
 plot(USDRiskPerTrade, title="USDRiskPerTrade", transp=100) // Shows risk per trade/loss. Multiply by Risk/Reward for Win estimates
 // Plot 3
 plot(riskRewardRatio, title="riskRewardRatio", transp=100)
-
+ 
 // PLOT RLZ Moved From Above Section
-// Plot 
+// Plot
 p1 = plot(longUpperRLZ, color=color.green, title="61.8 (long)")
-// Plot 
+// Plot
 p2 = plot(longLowerRLZ, color=color.green, title="78.6 (long)")
 fill(p1, p2, color=#7DCEA0, transp=90, title="RLZ long")
 // Plot 3
@@ -541,204 +557,236 @@ p3 = plot(shortUpperRLZ, color=color.red, title="78.6 (short)")
 // Plot 4
 p4 = plot(shortLowerRLZ, color=color.red, title="61.8 (short)")
 fill(p3, p4, color=#cd6155, transp=90, title="RLZ short")
-
-
+ 
+ 
 // PLOT LEMON
-plotshape(show and longCondition and not longCondition[1] and SQON, title="Lemon long", style=shape.triangleup, location=location.belowbar, color=color.lime, text="Lemon-Long")
-plotshape(show and shortCondition and not shortCondition[1] and SQON, title="Lemon short", style=shape.triangledown, location=location.abovebar, color=color.red, text="Lemon-Short")
+plotshape(show and longCondition and not longCondition[1] and SQON, title="Lemon long", style=shape.triangleup, location=location.belowbar, color=color.lime, text="LONG")
+plotshape(show and shortCondition and not shortCondition[1] and SQON, title="Lemon short", style=shape.triangledown, location=location.abovebar, color=color.red, text="SHORT")
 plotshape(show and longCondition[1], title="Lemon long confirmed", style=shape.cross, location=location.bottom, color=color.lime, text="alert", transp=100)
 plotshape(show and shortCondition[1], title="Lemon short confirmed", style=shape.cross, location=location.top, color=color.red, text="alert", transp=100)
-
-
+ 
+ 
 if Shorttradeactive == true
     Shorttradetrigger := false
-
+ 
 if Longtradeactive == true
     Longtradetrigger := false
-
-
+ 
+ 
 // Plot Levels:
 pl1 = plot (StopLevel, title = "stoplevel", color=color.red)
 pl2 = plot (EntryLevel, title = "entrylevel", color=color.white)
 pl3 = plot (BELevel, title = "breakevenlevel", color=color.blue)
 pl4 = plot (TPLevel, title = "TPlevel", color=color.green)
-
+ 
 fill(pl1, pl2, color=color.red, transp=65)
 fill(pl2, pl3, color=color.blue, transp=65)
 fill(pl3, pl4, color=color.green, transp=65)
-
-
+ 
+ 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // Define and plot conflicting candles:
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    
+   
 // Subtypes of conflicting bars:
 //-------------------------------------------------------------------------------------------------------
-
-// Bartype 3a is a candle which crosses both BELevel and EntryLevel and has its close above the midline between BELevel and EntryLevel (longs) 
-// respecively has its close below the midline between BELevel and EntryLevel (shorts) 
+ 
+// Bartype 3a is a candle which crosses both BELevel and EntryLevel and has its close above the midline between BELevel and EntryLevel (longs)
+// respecively has its close below the midline between BELevel and EntryLevel (shorts)
 // In case of a Bartype 3a the logic shall NOT consider a trade as closed as break-even, but shall assume trade continuation with activated break-even-flag.
 //-------------------------------------------------------------------------------------------------------
-
+ 
 Bartype3_a_long = high > BELevel and high < TPLevel and low < EntryLevel and low > StopLevel and close > ((BELevel + EntryLevel)/2) and Longtradeactive
 Bartype3_a_short = high > EntryLevel and high  < StopLevel and low < BELevel and low > TPLevel and close < ((BELevel + EntryLevel)/2) and Shorttradeactive
 //barcolor(Bartype3_a_long or Bartype3_a_short? color.purple : na)
-
+ 
 //Bartype3_a_Counter = 0    
 //Bartype3_a_Counter := nz(Bartype3_a_Counter[1])
 //if Bartype3_a_long or Bartype3_a_short
 //    Bartype3_a_Counter := Bartype3_a_Counter + 1
-
+ 
 // Bartype 4a is a candle which crosses TPLevel, BELevel and EntryLevel and has its close above BELevel (longs) respectively close below BELevel (shorts)
 // In case of a Bartype 4a the logic shall consider a trade as closed winner and shall not assume trade as closed break-even.
 //-------------------------------------------------------------------------------------------------------
-
+ 
 Bartype4_a_long = high > TPLevel and low < EntryLevel and low > StopLevel and close > BELevel and Longtradeactive
 Bartype4_a_short = high > EntryLevel and high < StopLevel and low < TPLevel and close < BELevel and Shorttradeactive
-
-
+ 
+ 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // Trade resolution:
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+ 
 // Breakeven activation
 //-------------------------------------------------------------------------------------------------------
 shorttradeBElevelactivation = (low < BELevel) and not (low_m1 < TPLevel)
 longtradeBElevelactivation = (high > BELevel) and not (high_m1 > TPLevel)
-
+ 
 Breakevenactive = false
 Breakevenactive := nz(Breakevenactive[1])
-
+ 
 if ((Shorttradeactive ==  true) and (shorttradeBElevelactivation == true))
     Breakevenactive := true
-
+ 
 if ((Longtradeactive == true) and (longtradeBElevelactivation == true))
     Breakevenactive := true
-    
+   
 // loss trades
 //-------------------------------------------------------------------------------------------------------
-
+ 
 PlotLossCounter = 0
+LossShort = 0
+LossLong = 0
+ 
 PlotLossCounter := nz(PlotLossCounter[1])
-
+LossShort := nz(LossShort[1])
+LossLong := nz(LossLong[1])
+ 
 plotlosshort = if ((Shorttradeactive == true) and (high > StopLevel) and (Breakevenactive == false))
     y = 1 // only required to make code work
-
-plotchar(plotlosshort, char="X", location=location.abovebar, color=color.fuchsia, transp=0, offset=0, size=size.small)
-
+ 
+plotchar(plotlosshort, char="X", location=location.abovebar, color=color.red, transp=0, offset=0, size=size.small)
+ 
 if plotlosshort == true
     tradeactive := false
     Shorttradeactive := false
     Breakevenactive := false
     PlotLossCounter := PlotLossCounter + 1
-    
+    LossShort := LossShort +1
+ 
+   
 //plotlosshort := false
-
+ 
 plotlosslong = if ((Longtradeactive == true) and (low < StopLevel) and (Breakevenactive == false))
     r = 1 // only required to make code work
-    
-plotchar(plotlosslong, char="X", location=location.belowbar, color=color.fuchsia, transp=0, offset=0, size=size.small)
-
+   
+plotchar(plotlosslong, char="X", location=location.belowbar, color=color.red, transp=0, offset=0, size=size.small)
+ 
 if plotlosslong == true
     tradeactive := false
     Longtradeactive := false
     Breakevenactive := false
     PlotLossCounter := PlotLossCounter + 1
-    
+    LossLong := LossLong + 1
+   
 //plotlosslong := false
-
+ 
 // Breakeven trades
 //-------------------------------------------------------------------------------------------------------
-
+ 
 PlotBreakEvenCounter = 0
 PlotBreakEvenCounter := nz(PlotBreakEvenCounter[1])
-
+BELong = 0
+BELong := nz(BELong[1])
+BEShort = 0
+BEShort := nz(BEShort[1])
+ 
 plotBreakevenshort = if ((Shorttradeactive ==  true) and (high > EntryLevel) and (Breakevenactive == true) and not Bartype3_a_short and not Bartype4_a_short)
     h = 1 // only required to make code work
-    
+   
 plotchar(plotBreakevenshort, char="0", location=location.abovebar, color=color.blue, transp=0, offset=0, size=size.small)
-
+ 
 if plotBreakevenshort == true
     tradeactive := false
     Shorttradeactive := false
     Breakevenactive := false
     PlotBreakEvenCounter := PlotBreakEvenCounter + 1
-
+    BEShort := BEShort +1
+ 
 //plotBreakevenshort := false
-
+ 
 plotBreakevenlong = if ((Longtradeactive ==  true) and (low < EntryLevel) and (Breakevenactive == true) and not Bartype3_a_long and not Bartype4_a_long)
     e = 1 // only required to make code work
-    
+   
 plotchar(plotBreakevenlong, char="0", location=location.belowbar, color=color.blue, transp=0, offset=0, size=size.small)
-
+ 
 if plotBreakevenlong == true
     tradeactive := false
     Longtradeactive := false
     Breakevenactive := false
     PlotBreakEvenCounter := PlotBreakEvenCounter + 1
-    
-//plotBreakevenlong := false 
-
+    BELong := BELong +1
+   
+//plotBreakevenlong := false
+ 
 // Win trades
 //-------------------------------------------------------------------------------------------------------
 PlotWinCounter = 0
 PlotWinCounter := nz(PlotWinCounter[1])
-
+WinLong = 0
+WinLong := nz(WinLong[1])
+WinShort = 0
+WinShort := nz(WinShort[1])
+ 
 plotWinshort = if ((Shorttradeactive ==  true) and (low < TPLevel))
     n = 1  // only required to make code work
-
-plotchar(plotWinshort, char="1", location=location.belowbar, color=color.green, transp=0, offset=0, size=size.small)
-
+ 
+plotchar(plotWinshort, char="✓", location=location.belowbar, color=color.green, transp=0, offset=0, size=size.small)
+ 
 if plotWinshort == true
     tradeactive := false
     Shorttradeactive := false
     Breakevenactive := false
     PlotWinCounter := PlotWinCounter + 1
-    
+    WinShort := WinShort +1
+   
 //plotWinshort := false
-
+ 
 plotWinlong = if ((Longtradeactive ==  true) and (high > TPLevel))
     l = 1 // only required to make code work
-
-plotchar(plotWinlong, char="1", location=location.abovebar, color=color.green, transp=0, offset=0, size=size.small)
-
+ 
+plotchar(plotWinlong, char="✓", location=location.abovebar, color=color.green, transp=0, offset=0, size=size.small)
+ 
 if plotWinlong == true
     tradeactive := false
     Longtradeactive := false
     Breakevenactive := false
     PlotWinCounter := PlotWinCounter + 1
-    
+    WinLong := WinLong +1
+   
 //plotWinlong := false
-
-
+ 
+ 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // Trade closing signals
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+ 
 // c=position e=bitmex-testnet t=market ro=1
 // Original Code Below
 // alertcondition(plotlosshort or plotlosslong or plotBreakevenshort or plotBreakevenlong, title='Lemon Close Trade BE or Stop', message='Lemon Close at BE or Stop')
 // alertcondition(plotWinshort or plotWinlong, title='Lemon Close Trade Win', message='Lemon Win')
-
-alertcondition(plotlosshort or plotlosslong or plotBreakevenshort or plotBreakevenlong, title='Lemon Close Trade BE or Stop', message="c=position e=bitmex-testnet t=market ro=1")
-alertcondition(plotWinshort or plotWinlong, title='Lemon Close Trade Win', message="c=position e=bitmex-testnet t=market ro=1")
-
+ 
+alertcondition(plotlosshort or plotlosslong or plotBreakevenshort or plotBreakevenlong, title='Lemon Close Trade BE or Stop', message="{{ticker}} Close")
+alertcondition(plotWinshort or plotWinlong, title='Lemon Close Trade Win', message="{{ticker}} Take Profit")
+ 
 EquityCurve = PlotWinCounter * 2 * USDRiskPerTrade - PlotLossCounter * USDRiskPerTrade - (PlotWinCounter + PlotLossCounter + PlotBreakEvenCounter) * commission
-
-
+ 
+ 
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // Statistics
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ 
+//if (plotWinlong or plotWinshort or plotBreakevenlong or plotBreakevenshort or plotlosslong or plotlosshort) and not HideStatistics
+//    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter)
+//      + "\nLoss : " + tostring(PlotLossCounter) + "\nBE : " + tostring(PlotBreakEvenCounter),color = color.white, textcolor=color.white)
+ 
+winpercent = round((PlotWinCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+losspercent = round((PlotLossCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+bepercent = round((PlotBreakEvenCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+rrpercent = round((PlotWinCounter/(PlotWinCounter+PlotLossCounter))*100)
+ 
+//if (plotWinlong or plotWinshort or plotBreakevenlong or plotBreakevenshort or plotlosslong or plotlosshort) and not HideStatistics
+//    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) + " ("+ tostring(winpercent)+")% Long: " +tostring(WinLong) +" Short: "+ tostring(WinShort)
+//      + "\nLoss : " + tostring(PlotLossCounter) +" ("+tostring(losspercent)+")%"+" Long: "+tostring(LossLong)+" Short: "+tostring(LossShort)+"\nBE : " + tostring(PlotBreakEvenCounter)+" ("+ tostring(bepercent)+")% Long: "+tostring(BELong)+" Short: "+tostring(BEShort),color = color.white, textcolor=color.white)
 
 if (plotWinlong or plotWinshort or plotBreakevenlong or plotBreakevenshort or plotlosslong or plotlosshort) and not HideStatistics
-    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) 
-      + "\nLoss : " + tostring(PlotLossCounter) + "\nBE : " + tostring(PlotBreakEvenCounter),color = color.white, textcolor=color.white)
-
-
+    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) + " ("+ tostring(winpercent)+"%)"
+      + "\nLoss : " + tostring(PlotLossCounter) +" ("+tostring(losspercent)+"%)" + "\nBE : " + tostring(PlotBreakEvenCounter)+" ("+ tostring(bepercent)+"%)" + "\nRate : " + tostring (rrpercent)+"%)",color = color.white, textcolor=color.white)
+      
 
 // The following line is in order to print the equity curve:
 //-------------------------------------------------------------------------------------------------------
-
+ 
 plot (DisplayEquityCurve == true ? EquityCurve : na, title = "Profit and Loss", color=color.yellow, linewidth=3, style=plot.style_line)
-
+ 
 // Grimm is the man //
