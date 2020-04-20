@@ -5,72 +5,87 @@ study(title="GitLemon Modified", shorttitle="GitLemon Modified", overlay=true, p
  
 // INPUTS
 src = input(title="Source", type=input.source, defval=close)
- 
+
+globalwidth = input(9, minval=5, title="Global Max Width of W/M")
+globaloffset = input(0, minval=0, title="Global Offset of W/M")
+
 includePrice = input(defval=true, title="Use price")
 strictPrice = input(defval=false, title="Strict")
-rangePrice = input(9, minval=5, title="Max. width of price W/M")  // e.g. allow an price W/M to form over 7 bars.
-offsetPrice = input(0, minval=0, title="Max. offset of price W/M")  // e.g. allow an price W/M to form 1 bar in history. Keep this number low. The goal is to synch the market structure over multiple indicators.
- 
+//rangePrice = input(9, minval=5, title="Max. width of price W/M")  // e.g. allow an price W/M to form over 7 bars. 
+//offsetPrice = input(0, minval=0, title="Max. offset of price W/M")  // e.g. allow an price W/M to form 1 bar in history. Keep this number low. The goal is to synch the market structure over multiple indicators.
+rangePrice = globalwidth
+offsetPrice = globaloffset
+
 includeOBV = input(defval=true, title="Use OBV")
 strictOBV = input(defval=false, title="Strict")
-rangeOBV = input(9, minval=5, title="Max. width of OBV W/M")
-offsetOBV = input(0, minval=0, title="Max. offset of OBV W/M")
- 
+//rangeOBV = input(9, minval=5, title="Max. width of OBV W/M")
+//offsetOBV = input(0, minval=0, title="Max. offset of OBV W/M")
+rangeOBV = globalwidth
+offsetOBV = globaloffset
+
 includeWly = input(defval=true, title="Use Willy")
 includeWillyStupid = input(defval=false, title="Use Willy stupid")
 strictWly = input(defval=false, title="Strict")
-rangeWly = input(9, minval=5, title="Max. width of Willy W/M")
-offsetWly = input(0, minval=0, title="Max. offset of Willy W/M")
-lengthWly = input(22, minval=1, title="Willy length")
+//rangeWly = input(9, minval=5, title="Max. width of Willy W/M")
+//offsetWly = input(0, minval=0, title="Max. offset of Willy W/M")
+rangeWly = globalwidth
+offsetWly = globaloffset
+lengthWly = input(21, minval=1, title="Willy length")
 lengthWlyEma = input(13, minval=1, title="Willy length ema")
- 
- 
+
+
 includeMFI = input(defval=false, title="Use MFI")
-strictMFI = input(defval=false, title="Strict")
-rangeMFI = input(9, minval=5, title="Max. width of MFI W/M")
-offsetMFI = input(0, minval=0, title="Max. offset of MFI W/M")
+strictMFI = input(defval=true, title="Strict")
+//rangeMFI = input(9, minval=5, title="Max. width of MFI W/M")
+//offsetMFI = input(0, minval=0, title="Max. offset of MFI W/M")
+rangeMFI = globalwidth
+offsetMFI = globaloffset
 lengthMFI = input(14, minval=1, title="MFI length")
- 
-includeRSI = input(defval=true, title="Use RSI")
-strictRSI = input(defval=false, title="Strict")
-rangeRSI = input(9, minval=5, title="Max. width of RSI W/M")
-offsetRSI = input(0, minval=0, title="Max. offset of RSI W/M")
+
+includeRSI = input(defval=false, title="Use RSI")
+strictRSI = input(defval=true, title="Strict")
+//rangeRSI = input(9, minval=5, title="Max. width of RSI W/M")
+//offsetRSI = input(0, minval=0, title="Max. offset of RSI W/M")
+rangeRSI = globalwidth
+offsetRSI = globaloffset
 lengthRSI = input(14, minval=1, title="RSI length")
- 
-includeDMI = input(defval=true, title="Use DMI (DI+ & DI-)")
-strictDMI = input(defval=false, title="Strict")
-rangeDMI = input(12, minval=5, title="Max. width of DMI W/M")
-offsetDMI = input(0, minval=0, title="Max. offset of DMI W/M")
+
+includeDMI = input(defval=false, title="Use DMI (DI+ & DI-)")
+strictDMI = input(defval=true, title="Strict")
+//rangeDMI = input(9, minval=5, title="Max. width of DMI W/M")
+//offsetDMI = input(0, minval=0, title="Max. offset of DMI W/M")
+rangeDMI = globalwidth
+offsetDMI = globaloffset
 lengthDMI = input(14, minval=1, title="DMI length")
- 
+
 includeWithinRLZ = input(defval=false, title="Price within RLZ")
 includeBelowRLZ = input(defval=false, title="Price above/below RLZ")
-upperBoundRLZ = input(defval=62.5, minval=0.0, maxval=100.0, title="Upper bound of RLZ (fib)")
-lowerBoundRLZ = input(defval=75, minval=0.0, maxval=100.0, title="Lower bound of RLZ (fib)")
-lengthPeriodRLZ = input(defval=89, minval=5, title="Lookback period (bars)")
+upperBoundRLZ = input(defval=61.8, minval=0.0, maxval=100.0, title="Upper bound of RLZ (fib)")
+lowerBoundRLZ = input(defval=78.6, minval=0.0, maxval=100.0, title="Lower bound of RLZ (fib)")
+lengthPeriodRLZ = input(defval=200, minval=5, title="Lookback period (bars)")
 showRLZLong = input(defval=false, title="Draw RLZ long")
 showRLZShort = input(defval=false, title="Draw RLZ short")
- 
+
 ATH = highest(high, lengthPeriodRLZ)
 ATL = lowest(low, lengthPeriodRLZ)
- 
+
 Leverage = input(1)
 USDRiskPerTrade = input(defval=1, title="Fixed risk amount per trade in USD", type=input.integer) // Changing to $1 from $50
- 
+
 HideStatistics = input(false)
 DisplayEquityCurve = input(false)
- 
+
 // commission = input(title="Estimated commission per round-turn in USD", defval=0.1744)
 commission = input(title="Estimated commission per round-turn in USD", defval=0.2)
- 
+
 // FOR TTM SQUEEZE MODULE
 strict = input(false, title="Enabled (original) or Disabled (strict)")
-length = input(21, minval=1, title="BB Length")
-mult = input(2.1, minval=0.001, maxval=50, title="StDev")
- 
+length = input(20, minval=1, title="BB Length")
+mult = input(2.0, minval=0.001, maxval=50, title="StDev")
+
 useTrueRange = input(true)
-klength = input(21, minval=1, title="Keltner Length")
-kmult = input(2, title="Multiplier")
+klength = input(20, minval=1, title="Keltner Length")
+kmult = input(2.0, title="Multiplier")
 ksrc = input(close, title="Keltner Source")
  
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -483,11 +498,11 @@ mid_color = SQON ? color.red : color.green
 // c=position e=bitmex-testnet t=market ro=1 // Closes all open positions at market w/ reduce only flag - Closing Signals Alert // Tested Successfully
 // message="e=bitmex-testnet s=xbtusd b=long q=100 fp={{plot(\"Entry Buy\")}} l=10 t=limit"    
 // alertcondition(close > 0, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} Lemon long entry') // Original Code
+alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message='{{ticker}} LONG') // Original Code
 // alertcondition(show and longCondition and not longCondition[1] and SQON, title='Lemon Entry Trade Sig Long', message="e=bitmex-testnet s=xbtusd b=long q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // Orig
  
 // alertcondition(high > 0, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market") // added close>0 for testing
-alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} - Lemon short entry") // Original Code
+alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="{{ticker}} SHORT") // Original Code
 // alertcondition(show and shortCondition and not shortCondition[1] and SQON, title='Lemon Entry Trade Sig Short', message="e=bitmex-testnet s=xbtusd b=short q={{plot(\"TradeSizeInUSD\")}} l=1 t=market")
  
  
@@ -741,8 +756,8 @@ if plotWinlong == true
 // alertcondition(plotlosshort or plotlosslong or plotBreakevenshort or plotBreakevenlong, title='Lemon Close Trade BE or Stop', message='Lemon Close at BE or Stop')
 // alertcondition(plotWinshort or plotWinlong, title='Lemon Close Trade Win', message='Lemon Win')
  
-alertcondition(plotlosshort or plotlosslong or plotBreakevenshort or plotBreakevenlong, title='Lemon Close Trade BE or Stop', message="c=position e=bitmex-testnet t=market ro=1")
-alertcondition(plotWinshort or plotWinlong, title='Lemon Close Trade Win', message="c=position e=bitmex-testnet t=market ro=1")
+alertcondition(plotlosshort or plotlosslong or plotBreakevenshort or plotBreakevenlong, title='Lemon Close Trade BE or Stop', message="{{ticker}} Close")
+alertcondition(plotWinshort or plotWinlong, title='Lemon Close Trade Win', message="{{ticker}} Take Profit")
  
 EquityCurve = PlotWinCounter * 2 * USDRiskPerTrade - PlotLossCounter * USDRiskPerTrade - (PlotWinCounter + PlotLossCounter + PlotBreakEvenCounter) * commission
  
@@ -758,12 +773,17 @@ EquityCurve = PlotWinCounter * 2 * USDRiskPerTrade - PlotLossCounter * USDRiskPe
 winpercent = round((PlotWinCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
 losspercent = round((PlotLossCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
 bepercent = round((PlotBreakEvenCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+rrpercent = round((PlotWinCounter/(PlotWinCounter+PlotLossCounter))*100)
  
+//if (plotWinlong or plotWinshort or plotBreakevenlong or plotBreakevenshort or plotlosslong or plotlosshort) and not HideStatistics
+//    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) + " ("+ tostring(winpercent)+")% Long: " +tostring(WinLong) +" Short: "+ tostring(WinShort)
+//      + "\nLoss : " + tostring(PlotLossCounter) +" ("+tostring(losspercent)+")%"+" Long: "+tostring(LossLong)+" Short: "+tostring(LossShort)+"\nBE : " + tostring(PlotBreakEvenCounter)+" ("+ tostring(bepercent)+")% Long: "+tostring(BELong)+" Short: "+tostring(BEShort),color = color.white, textcolor=color.white)
+
 if (plotWinlong or plotWinshort or plotBreakevenlong or plotBreakevenshort or plotlosslong or plotlosshort) and not HideStatistics
-    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) + " ("+ tostring(winpercent)+")% Long: " +tostring(WinLong) +" Short: "+ tostring(WinShort)
-      + "\nLoss : " + tostring(PlotLossCounter) +" ("+tostring(losspercent)+")%"+" Long: "+tostring(LossLong)+" Short: "+tostring(LossShort)+"\nBE : " + tostring(PlotBreakEvenCounter)+" ("+ tostring(bepercent)+")% Long: "+tostring(BELong)+" Short: "+tostring(BEShort),color = color.white, textcolor=color.white)
- 
- 
+    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) + " ("+ tostring(winpercent)+"%)"
+      + "\nLoss : " + tostring(PlotLossCounter) +" ("+tostring(losspercent)+"%)" + "\nBE : " + tostring(PlotBreakEvenCounter)+" ("+ tostring(bepercent)+"%)" + "\nRate : " + tostring (rrpercent)+"%)",color = color.white, textcolor=color.white)
+      
+
 // The following line is in order to print the equity curve:
 //-------------------------------------------------------------------------------------------------------
  
