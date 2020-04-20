@@ -1,6 +1,6 @@
 //@version=4
 //GitLemon
-study(title="GitLemon Modified", shorttitle="GitLemon Modified", overlay=true, precision=8)
+study(title="GitLemon", shorttitle="GitLemon", overlay=true, precision=8)
  
  
 // INPUTS
