@@ -731,12 +731,14 @@ EquityCurve = PlotWinCounter * 2 * USDRiskPerTrade - PlotLossCounter * USDRiskPe
 // Statistics
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+winpercent = round((PlotWinCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+losspercent = round((PlotLossCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+bepercent = round((PlotBreakEvenCounter/(PlotWinCounter+PlotLossCounter+PlotBreakEvenCounter)*100))
+ 
 if (plotWinlong or plotWinshort or plotBreakevenlong or plotBreakevenshort or plotlosslong or plotlosshort) and not HideStatistics
-    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) 
-      + "\nLoss : " + tostring(PlotLossCounter) + "\nBE : " + tostring(PlotBreakEvenCounter),color = color.white, textcolor=color.white)
-
-
-
+    l = label.new(bar_index, high + StatisticsVerticalOffset, style=label.style_none, text="Win : " + tostring(PlotWinCounter) + " ("+ tostring(winpercent)+")% Long: " +tostring(WinLong) +" Short: "+ tostring(WinShort)
+      + "\nLoss : " + tostring(PlotLossCounter) +" ("+tostring(losspercent)+")%"+" Long: "+tostring(LossLong)+" Short: "+tostring(LossShort)+"\nBE : " + tostring(PlotBreakEvenCounter)+" ("+ tostring(bepercent)+")% Long: "+tostring(BELong)+" Short: "+tostring(BEShort),color = color.white, textcolor=color.white)
+ 
 // The following line is in order to print the equity curve:
 //-------------------------------------------------------------------------------------------------------
 
