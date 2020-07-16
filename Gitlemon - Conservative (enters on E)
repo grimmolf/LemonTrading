@@ -232,7 +232,7 @@ OBVs = cum(change(src) > 0 ? volume : change_1 < 0 ? -volume : 0 * volume)
 upper_s = sum(volume * (change(hlc3) <= 0 ? 0 : hlc3), lengthMFI)
 lower_s = sum(volume * (change(hlc3) >= 0 ? 0 : hlc3), lengthMFI)
 MFIs = rsi(upper_s, lower_s)
-RSIs = rsi(lengthRSI, src)
+RSIs = rsi(src,lengthRSI)
 SMAs = sma(src, lengthSMA)
 // make willy series
 upperWly = highest(lengthWly)
